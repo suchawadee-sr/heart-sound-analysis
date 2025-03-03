@@ -11,8 +11,15 @@ from tensorflow.keras.models import load_model
 # ตั้งค่าให้ Streamlit รองรับ layout กว้าง
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
 
+# 🎨 CSS สำหรับฟอนต์และการตกแต่ง
 st.markdown("""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Kanit:wght@300;400;600&family=Poppins:wght@300;400;600&family=Nunito:wght@300;400;600&display=swap');
+
+        body, h1, h2, h3, h4, h5, h6, p, div, span {
+            font-family: 'Prompt', 'Kanit', 'Poppins', 'Nunito', sans-serif;
+        }
+
         .header {
             text-align: center;
             font-size: 40px;
@@ -23,8 +30,33 @@ st.markdown("""
             -webkit-text-fill-color: transparent;
             padding: 20px;
         }
+
+        .rounded-box {
+            background-color: #FFEEF2;
+            border-radius: 15px;
+            padding: 15px;
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .stButton>button {
+            background-color: #FF6B6B !important;
+            color: white !important;
+            border-radius: 20px !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            padding: 10px 20px !important;
+        }
+
+        .stFileUploader {
+            background-color: #FFF3F3 !important;
+            border-radius: 15px !important;
+        }
     </style>
 """, unsafe_allow_html=True)
+
 
 # 🎯 ใช้ Gradient Text เป็น Title ของเว็บ
 st.markdown('<div class="header">Heartbeat Health ❤️</div>', unsafe_allow_html=True)
@@ -35,13 +67,10 @@ GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"
 # 🎯 ตรวจสอบว่าโมเดลมีหรือยัง ถ้าไม่มีให้โหลด
 model_path = "model_heartbeat.h5"
 if not os.path.exists(model_path):
-    st.write("📥 Downloading model from Google Drive...")
     url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
     gdown.download(url, model_path, quiet=False)
 
-st.write("✅ Loading model...")
 model = load_model(model_path)
-st.write("✅ Model loaded successfully!")
 
 # 🎯 ฟังก์ชัน Band-pass Filter (20Hz - 200Hz)
 def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
