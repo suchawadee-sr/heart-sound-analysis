@@ -27,107 +27,50 @@ st.write("✅ Loading model...")
 model = load_model(model_path)
 st.write("✅ Model loaded successfully!")
 
-# 🎯 ฟังก์ชัน Band-pass Filter (20Hz - 200Hz)
+# 🔹 ฟังก์ชัน Band-pass Filter (20Hz - 200Hz)
 def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     nyq = 0.5 * sr
     low = lowcut / nyq
     high = highcut / nyq
-    b, a = butter(order, [low, high], btype="band")
-    return filtfilt(b, a, y)
+    b, a = signal.butter(order, [low, high], btype='band')
+    y_filtered = signal.filtfilt(b, a, y)
+    return y_filtered
 
-# 🎯 ฟังก์ชันแสดง Spectrogram
-def plot_spectrogram(y, sr, title="Spectrogram"):
-    fig, ax = plt.subplots(figsize=(6, 3))
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
-    librosa.display.specshow(D, sr=sr, x_axis="time", y_axis="log", cmap="magma")
-    plt.colorbar(format="%+2.0f dB")
-    plt.title(title)
-    return fig
-
-# 🎯 ฟังก์ชันประมวลผลเสียง (รวมฟิลเตอร์)
-def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
-    try:
-        y, sr = librosa.load(file_path, sr=sr)
-        y_filtered = bandpass_filter(y, sr)  # ใช้ Band-pass Filter
-        mel_spec = librosa.feature.melspectrogram(y=y_filtered, sr=sr, n_mels=n_mels)
-        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
-
-        # ปรับขนาดข้อมูลให้พอดีกับโมเดล
-        if mel_spec_db.shape[1] < max_frames:
-            pad_width = max_frames - mel_spec_db.shape[1]
-            mel_spec_db = np.pad(mel_spec_db, pad_width=((0, 0), (0, pad_width)), mode="constant")
-        else:
-            mel_spec_db = mel_spec_db[:, :max_frames]
-
-        return mel_spec_db.reshape(1, 128, 128, 1), y, y_filtered, sr
-
-    except Exception as e:
-        st.error(f"❌ Error processing audio: {e}")
-        return None, None, None, None
-
-# 🎯 อัปโหลดไฟล์เสียง
-st.markdown("📂 **อัปโหลดไฟล์เสียงหัวใจ (.wav)**")
-uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
+# 🔹 UI สำหรับอัปโหลดไฟล์เสียง
+st.title("💖 Heart Sound Analysis")
+uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)", type=["wav"])
 
 if uploaded_file is not None:
-    # บันทึกไฟล์ชั่วคราว
-    file_path = "uploaded_heart_sound.wav"
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
+    # 🔹 อ่านไฟล์เสียง
+    y, sr = librosa.load(uploaded_file, sr=4000)
 
-    # ประมวลผลเสียง
-    preprocessed_audio, y_raw, y_filtered, sr = preprocess_audio(file_path)
+    # 🔹 กรองเสียงด้วย Band-pass Filter
+    y_filtered = bandpass_filter(y, sr)
 
-    if preprocessed_audio is not None:
-        # 🎯 แสดงผล Waveform และ Spectrogram
-        st.markdown("🎼 **เปรียบเทียบก่อนและหลังการกรองเสียง:**")
-        col1, col2 = st.columns(2)
+    # 🔹 แสดงกราฟเสียง (ก่อนและหลังฟิลเตอร์)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
-        with col1:
-            st.markdown("🎵 **Waveform ก่อนกรองเสียง**")
-            fig, ax = plt.subplots(figsize=(6, 3))
-            librosa.display.waveshow(y_raw, sr=sr, color="gray")
-            plt.title("Raw Heart Sound")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Amplitude")
-            st.pyplot(fig)
+    # ก่อนฟิลเตอร์
+    axes[0].set_title("Raw Heart Sound")
+    axes[0].set_ylabel("Amplitude")
+    librosa.display.waveshow(y, sr=sr, ax=axes[0], color="gray")
 
-        with col2:
-            st.markdown("🎶 **Waveform หลังกรองเสียง**")
-            fig, ax = plt.subplots(figsize=(6, 3))
-            librosa.display.waveshow(y_filtered, sr=sr, color="blue")
-            plt.title("Filtered Heart Sound")
-            plt.xlabel("Time (s)")
-            plt.ylabel("Amplitude")
-            st.pyplot(fig)
+    # หลังฟิลเตอร์
+    axes[1].set_title("Filtered Heart Sound")
+    axes[1].set_ylabel("Amplitude")
+    librosa.display.waveshow(y_filtered, sr=sr, ax=axes[1], color="blue")
 
-        # 🎯 แสดง Spectrogram
-        st.markdown("🎨 **Spectrogram เปรียบเทียบก่อนและหลังการกรองเสียง:**")
-        col3, col4 = st.columns(2)
+    st.pyplot(fig)  # ✅ แสดงกราฟ
 
-        with col3:
-            st.markdown("🎼 **ก่อนกรองเสียง**")
-            st.pyplot(plot_spectrogram(y_raw, sr, title="Raw Spectrogram"))
+    # 🔹 **บันทึกเสียงที่ผ่านฟิลเตอร์เป็นไฟล์ .wav**
+    filtered_file_path = "filtered_heart_sound.wav"
+    sf.write(filtered_file_path, y_filtered, sr)  # ✅ บันทึกไฟล์
 
-        with col4:
-            st.markdown("🎼 **หลังกรองเสียง**")
-            st.pyplot(plot_spectrogram(y_filtered, sr, title="Filtered Spectrogram"))
+    # 🔊 **ฟังเสียงก่อนและหลังฟิลเตอร์**
+    st.markdown("🔊 **ฟังเสียงก่อนและหลังฟิลเตอร์:**")
+    
+    # 🔹 เล่นเสียงดั้งเดิม
+    st.audio(uploaded_file, format="audio/wav")
 
-        # 🔈 ฟังเสียงก่อนและหลังฟิลเตอร์
-        st.markdown("🔊 **ฟังเสียงก่อนและหลังฟิลเตอร์:**")
-        st.audio(uploaded_file, format="audio/wav")
-
-        # บันทึกเสียงที่ผ่านฟิลเตอร์เป็นไฟล์ชั่วคราว
-        filtered_file_path = "filtered_heart_sound.wav"
-        sf.write(filtered_file_path, y_filtered, sr)
-
-        # เล่นเสียงที่ผ่านฟิลเตอร์
-        st.audio(filtered_file_path, format="audio/wav")
-
-        # 🎯 ทำนายผล
-        prediction = model.predict(preprocessed_audio)
-        predicted_class = np.argmax(prediction)
-        confidence = prediction[0][predicted_class]
-
-        classes = ["❤️ Healthy", "💔 Unhealthy"]
-        st.markdown(f"## 🔎 **ผลการวิเคราะห์:** {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})")
+    # 🔹 เล่นเสียงที่ผ่านฟิลเตอร์จากไฟล์
+    st.audio(filtered_file_path, format="audio/wav")
