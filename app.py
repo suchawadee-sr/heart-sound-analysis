@@ -113,17 +113,6 @@ if uploaded_file is not None:
             st.markdown("🎼 **หลังกรองเสียง**")
             st.pyplot(plot_spectrogram(y_filtered, sr, title="Filtered Spectrogram"))
 
-        # 🔈 ฟังเสียงก่อนและหลังฟิลเตอร์
-        st.markdown("🔊 **ฟังเสียงก่อนและหลังฟิลเตอร์:**")
-        st.audio(uploaded_file, format="audio/wav")
-
-        # บันทึกเสียงที่ผ่านฟิลเตอร์เป็นไฟล์ชั่วคราว
-        filtered_file_path = "filtered_heart_sound.wav"
-        sf.write(filtered_file_path, y_filtered, sr)
-
-        # เล่นเสียงที่ผ่านฟิลเตอร์
-        st.audio(filtered_file_path, format="audio/wav")
-
         # 🎯 ทำนายผล
         prediction = model.predict(preprocessed_audio)
         predicted_class = np.argmax(prediction)
