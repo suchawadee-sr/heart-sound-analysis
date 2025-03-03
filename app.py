@@ -8,7 +8,7 @@ import librosa.display
 from tensorflow.keras.models import load_model
 
 # 🔹 ใส่ Google Drive File ID ของโมเดล
-GDRIVE_FILE_ID = "1ABCD1234EFGH5678"  # 🔄 เปลี่ยนเป็นของคุณ
+GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # 🔄 เปลี่ยนเป็นของคุณ
 
 # 🔹 ตรวจสอบว่ามีโมเดลหรือยัง ถ้าไม่มีให้ดาวน์โหลด
 model_path = "model_heartbeat.h5"
@@ -40,13 +40,12 @@ def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
     except Exception as e:
         return None, None, None
 
-# 🔹 UI ของ Web App
+# 🔹 UI ของ Web App (แบ่ง Layout เป็น 2 ส่วน)
 st.markdown(
     """
     <style>
     .stApp { background-color: #ffccd5; }
     .title { text-align: center; font-size: 30px; font-weight: bold; color: white; background: #ff6b81; padding: 20px; border-radius: 10px; }
-    .button { background: #8b0000; color: white; font-size: 18px; padding: 10px 20px; border-radius: 5px; }
     .frame { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; }
     </style>
     """,
@@ -55,7 +54,15 @@ st.markdown(
 
 st.markdown('<div class="title">❤️ heartbeat health</div>', unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)", type=["wav"])
+# 🔹 แบ่ง Layout เป็น 2 คอลัมน์
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("### 📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)")
+    uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
+
+with col2:
+    st.markdown("### 📊 ผลการวิเคราะห์")
 
 if uploaded_file:
     file_path = "temp_audio.wav"
@@ -64,23 +71,26 @@ if uploaded_file:
 
     preprocessed_audio, y, sr = preprocess_audio(file_path)
 
-    if preprocessed_audio is not None:
-        prediction = model.predict(preprocessed_audio)
-        predicted_class = np.argmax(prediction)
-        classes = ["💙 Healthy", "💔 Unhealthy"]
-        result = classes[predicted_class]
+    with col1:
+        st.markdown(f'<div class="frame">🔍 **จังหวะที่วัดได้:** {sr} Hz</div>', unsafe_allow_html=True)
 
-        st.markdown(f'<div class="frame"><b>🔍 จังหวะที่วัดได้:</b> {sr} Hz</div>', unsafe_allow_html=True)
-        st.markdown(f'<div class="frame"><b>📊 แสดงกราฟเสียง:</b></div>', unsafe_allow_html=True)
+    with col2:
+        if preprocessed_audio is not None:
+            prediction = model.predict(preprocessed_audio)
+            predicted_class = np.argmax(prediction)
+            classes = ["💙 Healthy", "💔 Unhealthy"]
+            result = classes[predicted_class]
 
-        fig, ax = plt.subplots(figsize=(10, 4))
-        librosa.display.waveshow(y, sr=sr, ax=ax)
-        plt.xlabel("Time (s)")
-        plt.ylabel("Amplitude")
-        plt.title("Waveform of Heart Sound")
-        st.pyplot(fig)
+            st.markdown(f'<div class="frame">📢 **ผลการวิเคราะห์:** {result}</div>', unsafe_allow_html=True)
 
-        st.markdown(f'<div class="frame"><b>📢 ผลการวิเคราะห์:</b> {result}</div>', unsafe_allow_html=True)
-
-    else:
-        st.error("⚠️ Audio preprocessing failed.")
+            # 🔹 แสดงกราฟ
+            with col1:
+                st.markdown(f'<div class="frame">📊 **แสดงกราฟเสียง:**</div>', unsafe_allow_html=True)
+                fig, ax = plt.subplots(figsize=(6, 3))
+                librosa.display.waveshow(y, sr=sr, ax=ax)
+                plt.xlabel("Time (s)")
+                plt.ylabel("Amplitude")
+                plt.title("Waveform of Heart Sound")
+                st.pyplot(fig)
+        else:
+            st.error("⚠️ Audio preprocessing failed.")
