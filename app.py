@@ -100,7 +100,7 @@ def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
         return None, None, None, None
 
 # 🎯 อัปโหลดไฟล์เสียง
-st.markdown('<div class="rounded-box">📂 **อัปโหลดไฟล์เสียงหัวใจ (.wav)**</div>', unsafe_allow_html=True)
+st.markdown('<div class="rounded-box">📂 อัปโหลดไฟล์เสียงหัวใจ (.wav) </div>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
 
 if uploaded_file is not None:
@@ -115,7 +115,7 @@ if uploaded_file is not None:
 
         # 🎯 แสดง Waveform ก่อนกรองเสียง
         with col1:
-            st.markdown('<div class="rounded-box">🎵 **Waveform ก่อนกรองเสียง**</div>', unsafe_allow_html=True)
+            st.markdown('<div class="rounded-box">🎵 Waveform ก่อนกรองเสียง </div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
             librosa.display.waveshow(y_raw, sr=sr, color="gray")
             plt.title("Raw Heart Sound")
@@ -126,7 +126,7 @@ if uploaded_file is not None:
 
         # 🎯 แสดง Waveform หลังกรองเสียง
         with col2:
-            st.markdown('<div class="rounded-box">🎶 **Waveform หลังกรองเสียง**</div>', unsafe_allow_html=True)
+            st.markdown('<div class="rounded-box">🎶 Waveform หลังกรองเสียง </div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
             librosa.display.waveshow(y_filtered, sr=sr, color="blue")
             plt.title("Filtered Heart Sound")
@@ -141,4 +141,4 @@ if uploaded_file is not None:
         confidence = prediction[0][predicted_class]
 
         classes = ["❤️ Healthy", "💔 Unhealthy"]
-        st.markdown(f'<div class="rounded-box">🔎 **ผลการวิเคราะห์:** {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="rounded-box">🔎 ผลการวิเคราะห์: {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})</div>', unsafe_allow_html=True)
