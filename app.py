@@ -141,4 +141,10 @@ if uploaded_file is not None:
         confidence = prediction[0][predicted_class]
 
         classes = ["❤️ Healthy", "💔 Unhealthy"]
-        st.markdown(f'<div class="rounded-box">🔎 ผลการวิเคราะห์: {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})</div>', unsafe_allow_html=True)
+        # ✅ **ผลลัพธ์ที่สวยงาม พร้อมค่าความมั่นใจด้านล่าง**
+        st.markdown(f"""
+            <div class="rounded-box">
+                🔎 ผลการวิเคราะห์: {classes[predicted_class]}
+                <div class="confidence">(ค่าความมั่นใจ: {confidence:.2f})</div>
+            </div>
+        """, unsafe_allow_html=True)
