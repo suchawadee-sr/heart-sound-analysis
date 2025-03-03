@@ -4,7 +4,7 @@ import os
 from tensorflow.keras.models import load_model
 
 # 🔹 ใส่ Google Drive File ID ของคุณที่นี่
-GDRIVE_FILE_ID = "1znyYiOQPDa274jtbYZGwLR91X1uqyqEJ"  # 🔄 เปลี่ยนเป็นของคุณ
+GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # 🔄 เปลี่ยนเป็นของคุณ
 
 # 🔹 ตรวจสอบว่ามีโมเดลหรือยัง ถ้าไม่มีให้ดาวน์โหลด
 model_path = "heartbeat_model.h5"
@@ -29,4 +29,13 @@ if uploaded_file:
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.write("✅ File uploaded successfully!")
+    preprocessed_audio = preprocess_audio(file_path)
+
+    if preprocessed_audio is not None:
+        prediction = model.predict(preprocessed_audio)
+        predicted_class = np.argmax(prediction)
+        classes = ["💙 Healthy", "💔 Unhealthy"]
+        result = classes[predicted_class]
+
+        st.write(f"### 🔍 ผลการวิเคราะห์: {result}")
+
