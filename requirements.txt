@@ -3,3 +3,4 @@ tensorflow
 numpy
 librosa
 matplotlib
+gdown
