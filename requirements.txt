@@ -1,6 +1,9 @@
 streamlit
-tensorflow
+gdown
 numpy
 librosa
+soundfile
 matplotlib
-gdown
+tensorflow
+scipy
+
