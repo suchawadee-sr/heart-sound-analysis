@@ -5,14 +5,13 @@ import librosa
 import numpy as np
 import matplotlib.pyplot as plt
 import librosa.display
-import soundfile as sf
 from scipy.signal import butter, filtfilt
 from tensorflow.keras.models import load_model
 
 # ตั้งค่าให้ Streamlit รองรับ layout กว้าง
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
 
-# 🎨 **CSS ตกแต่งให้เป็นสีแบบที่ต้องการ**
+# 🎨 CSS ตกแต่งให้สวยงาม
 st.markdown("""
     <style>
         body {
@@ -32,19 +31,9 @@ st.markdown("""
             border-radius: 10px !important;
             padding: 10px 20px;
         }
-        .stTextInput>div>div>input {
-            background-color: #7B3F3F !important;
-            color: white !important;
-            border-radius: 10px !important;
-        }
         .stFileUploader {
             background-color: #FFF5F5 !important;
             border-radius: 10px;
-        }
-        .stMarkdown {
-            font-size: 18px;
-            font-weight: bold;
-            color: #7B3F3F;
         }
         .header {
             background: linear-gradient(to bottom, #FF6B6B, #FFA07A);
@@ -71,7 +60,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🎨 **Header**
+# 🎨 Header
 st.markdown("""
     <div class="header">
         <h1>❤️ heartbeat health</h1>
@@ -79,8 +68,10 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 🎯 **โหลดโมเดล**
+# 🎯 ใส่ Google Drive File ID ของโมเดล
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"
+
+# 🎯 ตรวจสอบว่าโมเดลมีหรือยัง ถ้าไม่มีให้โหลด
 model_path = "model_heartbeat.h5"
 if not os.path.exists(model_path):
     st.write("📥 Downloading model from Google Drive...")
@@ -91,7 +82,7 @@ st.write("✅ Loading model...")
 model = load_model(model_path)
 st.write("✅ Model loaded successfully!")
 
-# 🎯 **ฟังก์ชัน Band-pass Filter**
+# 🎯 ฟังก์ชัน Band-pass Filter (20Hz - 200Hz)
 def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     nyq = 0.5 * sr
     low = lowcut / nyq
@@ -99,20 +90,11 @@ def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     b, a = butter(order, [low, high], btype="band")
     return filtfilt(b, a, y)
 
-# 🎯 **ฟังก์ชันแสดง Spectrogram**
-def plot_spectrogram(y, sr, title="Spectrogram"):
-    fig, ax = plt.subplots(figsize=(6, 3))
-    D = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
-    librosa.display.specshow(D, sr=sr, x_axis="time", y_axis="log", cmap="magma")
-    plt.colorbar(format="%+2.0f dB")
-    plt.title(title)
-    return fig
-
-# 🎯 **ฟังก์ชันประมวลผลเสียง**
+# 🎯 ฟังก์ชันประมวลผลเสียง
 def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
     try:
         y, sr = librosa.load(file_path, sr=sr)
-        y_filtered = bandpass_filter(y, sr)
+        y_filtered = bandpass_filter(y, sr)  # ใช้ Band-pass Filter
         mel_spec = librosa.feature.melspectrogram(y=y_filtered, sr=sr, n_mels=n_mels)
         mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
 
@@ -127,7 +109,7 @@ def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
         st.error(f"❌ Error processing audio: {e}")
         return None, None, None, None
 
-# 🎯 **อัปโหลดไฟล์เสียง**
+# 🎯 อัปโหลดไฟล์เสียง
 st.markdown('<div class="rounded-box">📂 **อัปโหลดไฟล์เสียงหัวใจ (.wav)**</div>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
 
@@ -141,6 +123,7 @@ if uploaded_file is not None:
     if preprocessed_audio is not None:
         col1, col2 = st.columns(2)
 
+        # 🎯 แสดง Waveform ก่อนกรองเสียง
         with col1:
             st.markdown('<div class="rounded-box">🎵 **Waveform ก่อนกรองเสียง**</div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
@@ -148,8 +131,10 @@ if uploaded_file is not None:
             plt.title("Raw Heart Sound")
             plt.xlabel("Time (s)")
             plt.ylabel("Amplitude")
+            plt.ylim(-1, 1)  # ให้กราฟมีขนาดเท่ากัน
             st.pyplot(fig)
 
+        # 🎯 แสดง Waveform หลังกรองเสียง
         with col2:
             st.markdown('<div class="rounded-box">🎶 **Waveform หลังกรองเสียง**</div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
@@ -157,19 +142,10 @@ if uploaded_file is not None:
             plt.title("Filtered Heart Sound")
             plt.xlabel("Time (s)")
             plt.ylabel("Amplitude")
+            plt.ylim(-1, 1)  # ให้กราฟมีขนาดเท่ากัน
             st.pyplot(fig)
 
-        st.markdown('<div class="rounded-box">🎨 **Spectrogram เปรียบเทียบก่อนและหลังการกรองเสียง:**</div>', unsafe_allow_html=True)
-        col3, col4 = st.columns(2)
-
-        with col3:
-            st.markdown("🎼 **ก่อนกรองเสียง**")
-            st.pyplot(plot_spectrogram(y_raw, sr, title="Raw Spectrogram"))
-
-        with col4:
-            st.markdown("🎼 **หลังกรองเสียง**")
-            st.pyplot(plot_spectrogram(y_filtered, sr, title="Filtered Spectrogram"))
-
+        # 🎯 ทำนายผล
         prediction = model.predict(preprocessed_audio)
         predicted_class = np.argmax(prediction)
         confidence = prediction[0][predicted_class]
