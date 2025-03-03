@@ -1,11 +1,26 @@
 import streamlit as st
 import gdown
 import os
-from tensorflow.keras.models import load_model
 import librosa
 import numpy as np
+from tensorflow.keras.models import load_model
 
-# 🔹 ฟังก์ชันประมวลผลไฟล์เสียงสำหรับโมเดล
+# 🔹 ใส่ Google Drive File ID ของโมเดลที่อัปโหลด
+GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # 🔄 เปลี่ยนเป็นของคุณ
+
+# 🔹 ตรวจสอบว่ามีโมเดลหรือยัง ถ้าไม่มีให้ดาวน์โหลด
+model_path = "model_heartbeat.h5"
+if not os.path.exists(model_path):
+    st.write("📥 Downloading model from Google Drive...")
+    url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+    gdown.download(url, model_path, quiet=False)
+
+# โหลดโมเดล
+st.write("✅ Loading model...")
+model = load_model(model_path)
+st.write("✅ Model loaded successfully!")
+
+# 🔹 ฟังก์ชันประมวลผลเสียง
 def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
     try:
         y, sr = librosa.load(file_path, sr=sr)
@@ -22,21 +37,6 @@ def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
 
     except Exception as e:
         return None
-
-# 🔹 ใส่ Google Drive File ID ของคุณที่นี่
-GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # 🔄 เปลี่ยนเป็นของคุณ
-
-# 🔹 ตรวจสอบว่ามีโมเดลหรือยัง ถ้าไม่มีให้ดาวน์โหลด
-model_path = "heartbeat_model.h5"
-if not os.path.exists(model_path):
-    st.write("📥 Downloading model from Google Drive...")
-    url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
-    gdown.download(url, model_path, quiet=False)
-
-# โหลดโมเดล
-st.write("✅ Loading model...")
-model = load_model(model_path)
-st.write("✅ Model loaded successfully!")
 
 # Web App Interface
 st.title("🔍 Heart Sound Classification Web App")
@@ -58,4 +58,5 @@ if uploaded_file:
         result = classes[predicted_class]
 
         st.write(f"### 🔍 ผลการวิเคราะห์: {result}")
-
+    else:
+        st.error("⚠️ Audio preprocessing failed.")
