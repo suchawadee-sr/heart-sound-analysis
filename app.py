@@ -12,18 +12,72 @@ from tensorflow.keras.models import load_model
 # ตั้งค่าให้ Streamlit รองรับ layout กว้าง
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
 
-# 🎨 **ตกแต่ง Header**
-header_html = """
-    <div style="
-        background: linear-gradient(to bottom, #FF6B6B, #FFA07A);
-        padding: 15px 20px;
-        text-align: left;
-        border-radius: 10px;">
-        <h1 style="color: white; font-size: 28px; display: inline;">❤️ heartbeat health</h1>
-        <span style="float: right; font-size: 28px;">🖤 🤍 ❤️</span>
+# 🎨 **CSS ตกแต่งให้เป็นสีแบบที่ต้องการ**
+st.markdown("""
+    <style>
+        body {
+            background-color: #FFDFDF;
+        }
+        .stApp {
+            background-color: #FFD1D1;
+        }
+        .block-container {
+            padding: 2rem;
+            background-color: #FFC0CB;
+            border-radius: 15px;
+        }
+        .stButton>button {
+            background-color: #7B3F3F !important;
+            color: white !important;
+            border-radius: 10px !important;
+            padding: 10px 20px;
+        }
+        .stTextInput>div>div>input {
+            background-color: #7B3F3F !important;
+            color: white !important;
+            border-radius: 10px !important;
+        }
+        .stFileUploader {
+            background-color: #FFF5F5 !important;
+            border-radius: 10px;
+        }
+        .stMarkdown {
+            font-size: 18px;
+            font-weight: bold;
+            color: #7B3F3F;
+        }
+        .header {
+            background: linear-gradient(to bottom, #FF6B6B, #FFA07A);
+            padding: 15px 20px;
+            text-align: left;
+            border-radius: 10px;
+        }
+        .header h1 {
+            color: white;
+            font-size: 28px;
+            display: inline;
+        }
+        .heart-icons {
+            float: right;
+            font-size: 28px;
+        }
+        .rounded-box {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# 🎨 **Header**
+st.markdown("""
+    <div class="header">
+        <h1>❤️ heartbeat health</h1>
+        <span class="heart-icons">🖤 🤍 ❤️</span>
     </div>
-"""
-st.markdown(header_html, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # 🎯 **โหลดโมเดล**
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"
@@ -37,7 +91,7 @@ st.write("✅ Loading model...")
 model = load_model(model_path)
 st.write("✅ Model loaded successfully!")
 
-# 🎯 **Band-pass Filter (20Hz - 200Hz)**
+# 🎯 **ฟังก์ชัน Band-pass Filter**
 def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     nyq = 0.5 * sr
     low = lowcut / nyq
@@ -45,7 +99,7 @@ def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     b, a = butter(order, [low, high], btype="band")
     return filtfilt(b, a, y)
 
-# 🎯 **Spectrogram Plot**
+# 🎯 **ฟังก์ชันแสดง Spectrogram**
 def plot_spectrogram(y, sr, title="Spectrogram"):
     fig, ax = plt.subplots(figsize=(6, 3))
     D = librosa.amplitude_to_db(np.abs(librosa.stft(y)), ref=np.max)
@@ -74,7 +128,7 @@ def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
         return None, None, None, None
 
 # 🎯 **อัปโหลดไฟล์เสียง**
-st.markdown("📂 **อัปโหลดไฟล์เสียงหัวใจ (.wav)**")
+st.markdown('<div class="rounded-box">📂 **อัปโหลดไฟล์เสียงหัวใจ (.wav)**</div>', unsafe_allow_html=True)
 uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
 
 if uploaded_file is not None:
@@ -85,12 +139,10 @@ if uploaded_file is not None:
     preprocessed_audio, y_raw, y_filtered, sr = preprocess_audio(file_path)
 
     if preprocessed_audio is not None:
-        # 🎯 **แบ่งหน้าจอ 2 ฝั่ง**
         col1, col2 = st.columns(2)
 
-        # **ฝั่งซ้าย**: แสดง Waveform ก่อนกรองเสียง
         with col1:
-            st.markdown("🎵 **Waveform ก่อนกรองเสียง**")
+            st.markdown('<div class="rounded-box">🎵 **Waveform ก่อนกรองเสียง**</div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
             librosa.display.waveshow(y_raw, sr=sr, color="gray")
             plt.title("Raw Heart Sound")
@@ -98,9 +150,8 @@ if uploaded_file is not None:
             plt.ylabel("Amplitude")
             st.pyplot(fig)
 
-        # **ฝั่งขวา**: แสดง Waveform หลังกรองเสียง
         with col2:
-            st.markdown("🎶 **Waveform หลังกรองเสียง**")
+            st.markdown('<div class="rounded-box">🎶 **Waveform หลังกรองเสียง**</div>', unsafe_allow_html=True)
             fig, ax = plt.subplots(figsize=(6, 3))
             librosa.display.waveshow(y_filtered, sr=sr, color="blue")
             plt.title("Filtered Heart Sound")
@@ -108,8 +159,7 @@ if uploaded_file is not None:
             plt.ylabel("Amplitude")
             st.pyplot(fig)
 
-        # 🎯 **Spectrogram เปรียบเทียบ**
-        st.markdown("🎨 **Spectrogram เปรียบเทียบก่อนและหลังการกรองเสียง:**")
+        st.markdown('<div class="rounded-box">🎨 **Spectrogram เปรียบเทียบก่อนและหลังการกรองเสียง:**</div>', unsafe_allow_html=True)
         col3, col4 = st.columns(2)
 
         with col3:
@@ -120,10 +170,9 @@ if uploaded_file is not None:
             st.markdown("🎼 **หลังกรองเสียง**")
             st.pyplot(plot_spectrogram(y_filtered, sr, title="Filtered Spectrogram"))
 
-        # 🎯 **ทำนายผลด้วย AI**
         prediction = model.predict(preprocessed_audio)
         predicted_class = np.argmax(prediction)
         confidence = prediction[0][predicted_class]
 
         classes = ["❤️ Healthy", "💔 Unhealthy"]
-        st.markdown(f"## 🔎 **ผลการวิเคราะห์:** {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})")
+        st.markdown(f'<div class="rounded-box">🔎 **ผลการวิเคราะห์:** {classes[predicted_class]} (ความมั่นใจ: {confidence:.2f})</div>', unsafe_allow_html=True)
