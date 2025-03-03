@@ -36,9 +36,18 @@ st.markdown("""
             border-radius: 15px;
             padding: 15px;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 20px;
             color: #333;
             margin: 10px 0;
+            text-align: center;
+        }
+
+        .confidence {
+            font-size: 12px;  /* ✅ ทำให้ค่าความมั่นใจเล็กกว่าข้อความปกติ */
+            font-weight: normal;
+            color: #666;
+            margin-top: 3px;
+            display: block;
         }
 
         .stButton>button {
