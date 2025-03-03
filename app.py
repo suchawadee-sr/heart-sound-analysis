@@ -229,11 +229,11 @@ if uploaded_file is not None:
         predicted_class = np.argmax(prediction)
         confidence = prediction[0][predicted_class]
 
-        classes = ["❤️ Healthy", "💔 Unhealthy"]
+        classes = ["❤️ ปกติ", "💔 ไม่ปกติ"]
         # ✅ **ผลลัพธ์ที่สวยงาม พร้อมค่าความมั่นใจตัวเล็กกว่าปกติ**
         st.markdown(f"""
             <div class="rounded-box">
-                🔎 ผลการวิเคราะห์: {classes[predicted_class]}
+                🔎 จังหวะการเต้นของหัวใจ: {classes[predicted_class]}
                 <span class="confidence">(ค่าความมั่นใจ: {confidence:.2f})</span>
             </div>
         """, unsafe_allow_html=True)
