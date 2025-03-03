@@ -9,8 +9,23 @@ import soundfile as sf
 from scipy.signal import butter, filtfilt
 from tensorflow.keras.models import load_model
 
-# ตั้งค่า Streamlit Page Config (ควรอยู่บรรทัดแรก)
-st.set_page_config(page_title="💖 Heart Sound Analysis", layout="wide")
+# ตั้งค่าให้ Streamlit รองรับ layout กว้าง
+st.set_page_config(page_title="Heartbeat Health", layout="wide")
+
+# CSS สำหรับตกแต่ง Header
+header_html = """
+    <div style="
+        background: linear-gradient(to bottom, #FF6B6B, #FFA07A);
+        padding: 10px 20px;
+        text-align: left;
+        border-radius: 10px;">
+        <h1 style="color: white; font-size: 30px; display: inline;">❤️ heartbeat health</h1>
+        <span style="float: right; font-size: 30px;">🖤 🤍 ❤️</span>
+    </div>
+"""
+
+# แสดง Header ใน Streamlit
+st.markdown(header_html, unsafe_allow_html=True)
 
 # 🎯 ใส่ Google Drive File ID ของโมเดล
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # เปลี่ยนเป็นของคุณ
