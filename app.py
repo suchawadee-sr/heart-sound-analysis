@@ -1,31 +1,22 @@
 import streamlit as st
-import librosa
-import librosa.display
-import numpy as np
-import matplotlib.pyplot as plt
+import gdown
+import os
 from tensorflow.keras.models import load_model
 
+# 🔹 ใส่ Google Drive File ID ของคุณที่นี่
+GDRIVE_FILE_ID = "1znyYiOQPDa274jtbYZGwLR91X1uqyqEJ"  # 🔄 เปลี่ยนเป็นของคุณ
+
+# 🔹 ตรวจสอบว่ามีโมเดลหรือยัง ถ้าไม่มีให้ดาวน์โหลด
+model_path = "heartbeat_model.h5"
+if not os.path.exists(model_path):
+    st.write("📥 Downloading model from Google Drive...")
+    url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+    gdown.download(url, model_path, quiet=False)
+
 # โหลดโมเดล
-model = load_model("heartbeat_model.h5")
-
-# ฟังก์ชันประมวลผลเสียง
-def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
-    try:
-        y, sr = librosa.load(file_path, sr=sr)
-        mel_spec = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels)
-        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
-
-        if mel_spec_db.shape[1] < max_frames:
-            pad_width = max_frames - mel_spec_db.shape[1]
-            mel_spec_db = np.pad(mel_spec_db, pad_width=((0, 0), (0, pad_width)), mode='constant')
-        else:
-            mel_spec_db = mel_spec_db[:, :max_frames]
-        
-        return mel_spec_db.reshape(1, 128, 128, 1)
-
-    except Exception as e:
-        st.error(f"Error processing {file_path}: {e}")
-        return None
+st.write("✅ Loading model...")
+model = load_model(model_path)
+st.write("✅ Model loaded successfully!")
 
 # Web App Interface
 st.title("🔍 Heart Sound Classification Web App")
@@ -38,20 +29,4 @@ if uploaded_file:
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    preprocessed_audio = preprocess_audio(file_path)
-
-    if preprocessed_audio is not None:
-        prediction = model.predict(preprocessed_audio)
-        predicted_class = np.argmax(prediction)
-        classes = ["💙 Healthy", "💔 Unhealthy"]
-        result = classes[predicted_class]
-
-        st.write(f"### 🔍 ผลการวิเคราะห์: {result}")
-
-        fig, ax = plt.subplots(figsize=(6, 4))
-        librosa.display.specshow(preprocessed_audio[0, :, :, 0], sr=4000, x_axis="time", y_axis="mel", ax=ax)
-        ax.set_title("🎭 Mel-Spectrogram")
-        st.pyplot(fig)
-
-    else:
-        st.error("⚠️ Audio preprocessing failed.")
+    st.write("✅ File uploaded successfully!")
