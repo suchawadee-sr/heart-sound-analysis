@@ -25,6 +25,7 @@ st.markdown("""
             color: white !important;
             border-radius: 5px !important;
             font-weight: bold;
+            font-size: 14px !important; /* ขนาดตัวหนังสือของปุ่ม */
         }
 
         /* ปรับให้ตัวอัปโหลดไฟล์ไม่เป็นสีเข้ม */
@@ -33,16 +34,11 @@ st.markdown("""
             border: 2px dashed #FF6B6B !important; /* ขอบเส้นประ */
         }
 
-        /* ปรับสีของข้อความให้เป็นสีเข้ากับ Light Mode */
+        /* ปรับสีของข้อความให้เป็นสีเข้ากับ Light Mode และลดขนาดตัวหนังสือ */
         div[data-testid="stFileUploader"] span {
             color: black !important;
+            font-size: 14px !important; /* ปรับขนาดตัวอักษรให้เล็กลง */
         }
-    </style>
-""", unsafe_allow_html=True)
-
-# 🎨 CSS สำหรับฟอนต์และการตกแต่ง
-st.markdown("""
-    <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Kanit:wght@300;400;600&family=Poppins:wght@300;400;600&family=Nunito:wght@300;400;600&display=swap');
 
         body, h1, h2, h3, h4, h5, h6, p, div, span {
@@ -95,9 +91,64 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# 🎨 CSS สำหรับฟอนต์และการตกแต่ง
+# st.markdown("""
+#     <style>
+#         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&family=Kanit:wght@300;400;600&family=Poppins:wght@300;400;600&family=Nunito:wght@300;400;600&display=swap');
+
+#         body, h1, h2, h3, h4, h5, h6, p, div, span {
+#             font-family: 'Prompt', 'Kanit', 'Poppins', 'Nunito', sans-serif;
+#         }
+
+#         .header {
+#             text-align: center;
+#             font-size: 40px;
+#             font-weight: bold;
+#             background: #CF008A;
+#             background: radial-gradient(circle farthest-corner at top center, #CF008A 4%, #CF799B 100%);
+#             -webkit-background-clip: text;
+#             -webkit-text-fill-color: transparent;
+#             padding: 20px;
+#         }
+
+#         .rounded-box {
+#             background-color: #FFEEF2;
+#             border-radius: 15px;
+#             padding: 15px;
+#             font-weight: 600;
+#             font-size: 20px;
+#             color: #333;
+#             margin: 10px 0;
+#             text-align: center;
+#         }
+
+#         .confidence {
+#             font-size: 12px;  /* ✅ ทำให้ค่าความมั่นใจเล็กกว่าข้อความปกติ */
+#             font-weight: normal;
+#             color: #666;
+#             margin-top: 3px;
+#             display: block;
+#         }
+
+#         .stButton>button {
+#             background-color: #FF6B6B !important;
+#             color: white !important;
+#             border-radius: 20px !important;
+#             font-size: 16px !important;
+#             font-weight: bold !important;
+#             padding: 10px 20px !important;
+#         }
+
+#         .stFileUploader {
+#             background-color: #FFF3F3 !important;
+#             border-radius: 15px !important;
+#         }
+#     </style>
+# """, unsafe_allow_html=True)
+
 
 # 🎯 ใช้ Gradient Text เป็น Title ของเว็บ
-st.markdown('<div class="header">Heartbeat Health ❤️</div>', unsafe_allow_html=True)
+st.markdown('<div class="header">❤️ Heartbeat Health ❤️</div>', unsafe_allow_html=True)
 
 # 🎯 ใส่ Google Drive File ID ของโมเดล
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"
