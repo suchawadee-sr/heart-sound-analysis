@@ -61,9 +61,6 @@ with col1:
     st.markdown("### 📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)")
     uploaded_file = st.file_uploader("Drag and drop file here", type=["wav"])
 
-with col2:
-    st.markdown("### 📊 ผลการวิเคราะห์")
-
 if uploaded_file:
     file_path = "temp_audio.wav"
     with open(file_path, "wb") as f:
@@ -71,26 +68,24 @@ if uploaded_file:
 
     preprocessed_audio, y, sr = preprocess_audio(file_path)
 
-    with col1:
-        st.markdown(f'<div class="frame">🔍 **จังหวะที่วัดได้:** {sr} Hz</div>', unsafe_allow_html=True)
+    if preprocessed_audio is not None:
+        prediction = model.predict(preprocessed_audio)
+        predicted_class = np.argmax(prediction)
+        classes = ["💙 Healthy", "💔 Unhealthy"]
+        result = classes[predicted_class]
 
-    with col2:
-        if preprocessed_audio is not None:
-            prediction = model.predict(preprocessed_audio)
-            predicted_class = np.argmax(prediction)
-            classes = ["💙 Healthy", "💔 Unhealthy"]
-            result = classes[predicted_class]
-
+        with col2:
             st.markdown(f'<div class="frame">📢 **ผลการวิเคราะห์:** {result}</div>', unsafe_allow_html=True)
 
-            # 🔹 แสดงกราฟ
-            with col1:
-                st.markdown(f'<div class="frame">📊 **แสดงกราฟเสียง:**</div>', unsafe_allow_html=True)
-                fig, ax = plt.subplots(figsize=(6, 3))
-                librosa.display.waveshow(y, sr=sr, ax=ax)
-                plt.xlabel("Time (s)")
-                plt.ylabel("Amplitude")
-                plt.title("Waveform of Heart Sound")
-                st.pyplot(fig)
-        else:
-            st.error("⚠️ Audio preprocessing failed.")
+        # 🔹 แสดงกราฟเสียงฝั่งขวา
+        with col2:
+            st.markdown(f'<div class="frame">📊 **แสดงกราฟเสียง:**</div>', unsafe_allow_html=True)
+            fig, ax = plt.subplots(figsize=(6, 3))
+            librosa.display.waveshow(y, sr=sr, ax=ax)
+            plt.xlabel("Time (s)")
+            plt.ylabel("Amplitude")
+            plt.title("Waveform of Heart Sound")
+            st.pyplot(fig)
+
+    else:
+        st.error("⚠️ Audio preprocessing failed.")
