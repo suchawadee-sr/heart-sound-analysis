@@ -10,7 +10,33 @@ from tensorflow.keras.models import load_model
 
 # ตั้งค่าให้ Streamlit รองรับ layout กว้าง
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
+st.markdown("""
+    <style>
+        body {
+            background-color: #FFF !important;
+            color: black !important;
+        }
 
+        /* ปิดการใช้งาน Dark Mode ของ Streamlit */
+        [data-testid="stAppViewContainer"] {
+            background-color: #FFF !important;
+        }
+
+        [data-testid="stHeader"] {
+            background-color: #FFEEF2 !important;
+        }
+
+        [data-testid="stSidebar"] {
+            background-color: #FFF3F3 !important;
+        }
+
+        /* ปรับสีข้อความให้เข้ากับ Light Mode */
+        .rounded-box {
+            background-color: #FFEEF2;
+            color: #333;
+        }
+    </style>
+""", unsafe_allow_html=True)
 # 🎨 CSS สำหรับฟอนต์และการตกแต่ง
 st.markdown("""
     <style>
