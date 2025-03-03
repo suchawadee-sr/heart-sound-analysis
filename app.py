@@ -12,31 +12,34 @@ from tensorflow.keras.models import load_model
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
 st.markdown("""
     <style>
-        body {
-            background-color: #FFF !important;
+        /* ปรับให้ File Uploader เป็นสีพื้นหลังที่กำหนด */
+        div[data-testid="stFileUploader"] {
+            background-color: #FFF3F3 !important; /* สีชมพูอ่อน */
+            border-radius: 10px; /* ทำให้มุมโค้ง */
+            padding: 10px;
+        }
+
+        /* ปรับให้ปุ่ม Browse Files ดูสวยขึ้น */
+        div[data-testid="stFileUploader"] button {
+            background-color: #FF6B6B !important; /* สีแดงอ่อน */
+            color: white !important;
+            border-radius: 5px !important;
+            font-weight: bold;
+        }
+
+        /* ปรับให้ตัวอัปโหลดไฟล์ไม่เป็นสีเข้ม */
+        div[data-testid="stFileDropzone"] {
+            background-color: #FFEEF2 !important; /* สีชมพูอ่อน */
+            border: 2px dashed #FF6B6B !important; /* ขอบเส้นประ */
+        }
+
+        /* ปรับสีของข้อความให้เป็นสีเข้ากับ Light Mode */
+        div[data-testid="stFileUploader"] span {
             color: black !important;
-        }
-
-        /* ปิดการใช้งาน Dark Mode ของ Streamlit */
-        [data-testid="stAppViewContainer"] {
-            background-color: #FFF !important;
-        }
-
-        [data-testid="stHeader"] {
-            background-color: #FFEEF2 !important;
-        }
-
-        [data-testid="stSidebar"] {
-            background-color: #FFF3F3 !important;
-        }
-
-        /* ปรับสีข้อความให้เข้ากับ Light Mode */
-        .rounded-box {
-            background-color: #FFEEF2;
-            color: #333;
         }
     </style>
 """, unsafe_allow_html=True)
+
 # 🎨 CSS สำหรับฟอนต์และการตกแต่ง
 st.markdown("""
     <style>
