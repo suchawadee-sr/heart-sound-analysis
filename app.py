@@ -11,62 +11,23 @@ from tensorflow.keras.models import load_model
 # ตั้งค่าให้ Streamlit รองรับ layout กว้าง
 st.set_page_config(page_title="Heartbeat Health", layout="wide")
 
-# 🎨 CSS ตกแต่งให้สวยงาม
 st.markdown("""
     <style>
-        body {
-            background-color: #FFDFDF;
-        }
-        .stApp {
-            background-color: #FFD1D1;
-        }
-        .block-container {
-            padding: 2rem;
-            background-color: #FFC0CB;
-            border-radius: 15px;
-        }
-        .stButton>button {
-            background-color: #7B3F3F !important;
-            color: white !important;
-            border-radius: 10px !important;
-            padding: 10px 20px;
-        }
-        .stFileUploader {
-            background-color: #FFF5F5 !important;
-            border-radius: 10px;
-        }
         .header {
-            background: linear-gradient(to bottom, #FF6B6B, #FFA07A);
-            padding: 15px 20px;
-            text-align: left;
-            border-radius: 10px;
-        }
-        .header h1 {
-            color: white;
-            font-size: 28px;
-            display: inline;
-        }
-        .heart-icons {
-            float: right;
-            font-size: 28px;
-        }
-        .rounded-box {
-            background-color: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 40px;
+            font-weight: bold;
+            background: #CF008A;
+            background: radial-gradient(circle farthest-corner at top center, #CF008A 4%, #CF799B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 20px;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# 🎨 Header
-st.markdown("""
-    <div class="header">
-        <h1>❤️ heartbeat health</h1>
-        <span class="heart-icons">🖤 🤍 ❤️</span>
-    </div>
-""", unsafe_allow_html=True)
+# 🎯 ใช้ Gradient Text เป็น Title ของเว็บ
+st.markdown('<div class="header">Heartbeat Health ❤️</div>', unsafe_allow_html=True)
 
 # 🎯 ใส่ Google Drive File ID ของโมเดล
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"
