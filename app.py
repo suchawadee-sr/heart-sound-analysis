@@ -26,6 +26,14 @@ def load_model():
 
 model = load_model()
 
+
+
+# 🎨 **UI ของ Web App**
+st.set_page_config(page_title="💖 Heart Sound Analysis", layout="wide")
+st.markdown("<h1 style='text-align: center; color: #ff4d6d;'>💖 Heartbeat Health</h1>", unsafe_allow_html=True)
+
+# 📂 อัปโหลดไฟล์เสียง
+uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)", type=["wav"])
 # 🔹 ฟังก์ชัน Band-pass Filter (20Hz - 200Hz)
 def bandpass_filter(y, sr, lowcut=20.0, highcut=200.0, order=4):
     nyq = 0.5 * sr
@@ -58,14 +66,7 @@ def preprocess_audio_for_prediction(file_path, sr=4000, n_mels=128, max_frames=1
 
     except Exception as e:
         return None, None, None, None
-
-# 🎨 **UI ของ Web App**
-st.set_page_config(page_title="💖 Heart Sound Analysis", layout="wide")
-st.markdown("<h1 style='text-align: center; color: #ff4d6d;'>💖 Heartbeat Health</h1>", unsafe_allow_html=True)
-
-# 📂 อัปโหลดไฟล์เสียง
-uploaded_file = st.file_uploader("📂 อัปโหลดไฟล์เสียงหัวใจ (.wav)", type=["wav"])
-
+        
 if uploaded_file is not None:
     with st.spinner("🔍 Processing audio..."):
         file_path = f"temp.wav"
