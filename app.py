@@ -2,6 +2,26 @@ import streamlit as st
 import gdown
 import os
 from tensorflow.keras.models import load_model
+import librosa
+import numpy as np
+
+# 🔹 ฟังก์ชันประมวลผลไฟล์เสียงสำหรับโมเดล
+def preprocess_audio(file_path, sr=4000, n_mels=128, max_frames=128):
+    try:
+        y, sr = librosa.load(file_path, sr=sr)
+        mel_spec = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels)
+        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+
+        if mel_spec_db.shape[1] < max_frames:
+            pad_width = max_frames - mel_spec_db.shape[1]
+            mel_spec_db = np.pad(mel_spec_db, pad_width=((0, 0), (0, pad_width)), mode='constant')
+        else:
+            mel_spec_db = mel_spec_db[:, :max_frames]
+
+        return mel_spec_db.reshape(1, 128, 128, 1)
+
+    except Exception as e:
+        return None
 
 # 🔹 ใส่ Google Drive File ID ของคุณที่นี่
 GDRIVE_FILE_ID = "13oUZjw0OTeOoxbk5-CZHsuDonY2oquPO"  # 🔄 เปลี่ยนเป็นของคุณ
