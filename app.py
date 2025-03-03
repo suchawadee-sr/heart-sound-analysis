@@ -91,7 +91,7 @@ if uploaded_file is not None:
             with col2:
                 st.markdown("🎵 **Waveform หลังกรองเสียง:**")
                 fig, ax = plt.subplots(figsize=(5, 2))
-                librosa.display.waveshow(y_filtered, sr=sr, color="blue")
+                librosa.display.waveshow(y_filtered, sr=sr, color="pink")
                 plt.title("Filtered Heart Sound")
                 plt.xlabel("Time (s)")
                 plt.ylabel("Amplitude")
